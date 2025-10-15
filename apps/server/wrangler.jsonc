@@ -4,7 +4,8 @@
 	"compatibility_date": "2025-06-15",
 	"compatibility_flags": ["nodejs_compat"],
 	"vars": {
-		"NODE_ENV": "production"
+		"NODE_ENV": "production",
+		"JWT_SECRET": "dev-secret-change-in-production"
 		// Add public environment variables here
 		// Example: "CORS_ORIGIN": "https://your-domain.com"
 	},

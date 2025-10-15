@@ -15,6 +15,20 @@
       "when": 1760497921017,
       "tag": "0001_natural_vampiro",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1760517874322,
+      "tag": "0002_stormy_jimmy_woo",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1760517987524,
+      "tag": "0003_lovely_random",
+      "breakpoints": true
     }
   ]
 }
