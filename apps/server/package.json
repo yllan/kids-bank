@@ -15,7 +15,8 @@
     "hono": "^4.8.2",
     "dotenv": "catalog:",
     "zod": "catalog:",
-    "@kids-bank/db": "workspace:*"
+    "@kids-bank/db": "workspace:*",
+    "drizzle-orm": "^0.44.2"
   },
   "devDependencies": {
     "typescript": "catalog:",
