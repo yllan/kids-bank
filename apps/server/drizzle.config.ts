@@ -6,8 +6,8 @@ dotenv.config({
 });
 
 export default defineConfig({
-	schema: "./src/schema",
-	out: "./src/migrations",
+	schema: "./src/db/schema",
+	out: "./drizzle",
 	// DOCS: https://orm.drizzle.team/docs/guides/d1-http-with-drizzle-kit
 	dialect: "sqlite",
 	driver: "d1-http",

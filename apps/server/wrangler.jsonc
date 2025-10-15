@@ -27,7 +27,7 @@
 			"database_name": "kids-bank-test",
 			"database_id": "351ee67d-4233-4a4c-81ee-00de3da4af7b",
 			"preview_database_id": "local-test-db",
-			"migrations_dir": "../../packages/db/src/migrations"
+			"migrations_dir": "drizzle"
 		}
 	]
 }

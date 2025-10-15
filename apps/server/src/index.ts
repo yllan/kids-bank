@@ -4,11 +4,7 @@ import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import apis from './api'
 
-type Bindings = {
-  JWT_SECRET: string
-}
-
-const app = new Hono<{ Bindings: Bindings }>()
+const app = new Hono()
 console.log('CORS_ORIGIN:', env.CORS_ORIGIN)
 app.use(logger())
 app.use(

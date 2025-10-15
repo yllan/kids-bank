@@ -14,7 +14,7 @@ export async function authMiddleware(c: Context, next: Next) {
 
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.substring(7)
-    const secret = c.env.JWT_SECRET || 'default-secret-change-me'
+    const secret = c.env.JWT_SECRET || 'xijingping-8964-tiananmen'
 
     const payload = await verifyJWT(token, secret)
     if (payload) {

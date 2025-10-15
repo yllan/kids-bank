@@ -1,10 +1,11 @@
 import { Hono } from 'hono'
-import { eq } from 'drizzle-orm'
-import { clientsTable, accountsTable, db } from '@/db'
+import { eq, and, gte } from 'drizzle-orm'
+import { clientsTable, accountsTable, db, changesTable } from '@/db'
 import bcrypt from 'bcryptjs'
 import { signJWT } from './utils/jwt'
 import type { AuthContext } from './middleware/auth'
 import { authMiddleware } from './middleware/auth'
+import { changeHash } from './utils/change'
 
 type Bindings = {
   JWT_SECRET: string
@@ -80,7 +81,7 @@ api.post('/accounts/:id/authToken', async (c) => {
     }
 
     // Generate JWT with updated authorized accounts
-    const secret = c.env.JWT_SECRET
+    const secret = c.env.JWT_SECRET || 'xijingping-8964-tiananmen'
     const token = await signJWT({ authorizedAccounts }, secret)
 
     return c.json({ token }, 200)
@@ -99,21 +100,12 @@ api.get('/accounts', async (c) => {
 
     // Filter response based on authorization
     const response = accounts.map((account) => {
-      const hasAccess = auth?.authorizedAccounts.includes(account.id)
-
-      if (hasAccess) {
-        // Return all fields including birthday
-        return {
-          id: account.id,
-          name: account.name,
-          birthday: account.birthday,
-        }
-      } else {
-        // Return only id and name
-        return {
-          id: account.id,
-          name: account.name,
-        }
+      const hasAccess = !account.password || auth?.authorizedAccounts.includes(account.id)
+      return {
+        id: account.id,
+        name: account.name,
+        hasAccess,
+        ...(hasAccess && { birthday: account.birthday }), // Include birthday only if hasAccess is true
       }
     })
 
@@ -152,6 +144,70 @@ api.post('/accounts', async (c) => {
     console.error('Create account error:', error)
     return c.json({ error: 'Failed to create account' }, 500)
   }
+})
+
+api.get('/accounts/:id/changes', async (c) => {
+  // get changes for account
+  const accountId: string = c.req.param('id')
+  const account = (await db.select().from(accountsTable).where(eq(accountsTable.id, accountId)).limit(1))[0]
+  if (!account) {
+    return c.json({ error: 'Account not found' }, 404)
+  }
+
+  const since = c.req.query('since') ?? '0'
+  const auth = c.get('auth')
+  const hasAccess = !account.password || auth?.authorizedAccounts.includes(accountId)
+  if (!hasAccess) {
+    return c.json({ error: 'Unauthorized' }, 401)
+  }
+
+  const changes = await db
+    .select()
+    .from(changesTable)
+    .where(
+      and(
+        eq(changesTable.account, accountId),
+        gte(changesTable.ver, Number(since)),
+      )
+    )
+
+  return c.json({ changes }, 200)
+})
+
+api.post('/accounts/:id/changes', async (c) => {
+  const accountId: string = c.req.param('id')
+  const account = (await db.select().from(accountsTable).where(eq(accountsTable.id, accountId)).limit(1))[0]
+  if (!account) {
+    return c.json({ error: 'Account not found' }, 404)
+  }
+
+  const auth = c.get('auth')
+  const hasAccess = !account.password || auth?.authorizedAccounts.includes(accountId)
+  if (!hasAccess) {
+    return c.json({ error: 'Unauthorized' }, 401)
+  }
+
+  const body = await c.req.json()
+  const { changes } = body
+  const written = []
+  for (const change of changes) {
+    const hash = await changeHash(change)
+    try {
+      // Convert createdAt timestamp to Date object for drizzle
+      const changeToInsert = {
+        ...change,
+        createdAt: new Date(change.createdAt),
+        hash,
+      }
+      console.log(changeToInsert)
+      const result = await db.insert(changesTable).values(changeToInsert).onConflictDoNothing().returning()
+      written.push(...result)
+    } catch (error) {
+      console.error('Insert change error:', error)
+      // return c.json({ error: 'Failed to record change' }, 500)
+    }
+  }
+  return c.json({ changes: written }, 201)
 })
 
 export default api

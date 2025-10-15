@@ -20,7 +20,6 @@ export async function signJWT(payload: JWTPayload, secret: string): Promise<stri
 export async function verifyJWT(token: string, secret: string): Promise<JWTPayload | null> {
   try {
     const payload = await verify(token, secret)
-    console.log('Verified JWT payload:', payload)
     return payload as JWTPayload
   } catch (error) {
     return null
