@@ -43,10 +43,9 @@ app.post("/kids", async (c) => {
 	const body = await c.req.json();
 
 	const newKid = await db.insert(kidsTable).values({
-		id: body.id,
 		name: body.name,
-		birthdate: body.birthdate,
-	}).returning();
+		birthday: body.birthday,
+	}).returning()
 
 	return c.json(newKid[0], 201);
 });

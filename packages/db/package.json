@@ -16,7 +16,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "bunx wrangler d1 migrations apply DB --local --config ../../apps/server/wrangler.jsonc"
   },
   "devDependencies": {
     "drizzle-kit": "^0.31.2",
@@ -26,9 +26,10 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "drizzle-orm": "^0.44.2",
     "@libsql/client": "^0.14.0",
     "dotenv": "catalog:",
+    "drizzle-orm": "^0.44.2",
+    "ulid": "^3.0.1",
     "zod": "catalog:"
   }
 }

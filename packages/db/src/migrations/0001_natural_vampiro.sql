@@ -1,0 +1,1 @@
+ALTER TABLE `kids` RENAME COLUMN "birthdate" TO "birthday";
